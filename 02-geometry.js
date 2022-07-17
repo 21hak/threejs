@@ -46,7 +46,32 @@ class App {
 
   _setupModel() {
     // 정육면체 생성
-    const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2); // 가로, 세로, 깊이, 가로 분할, 세로 분할, 깊이 분할
+    // const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2); // 가로, 세로, 깊이, 가로 분할, 세로 분할, 깊이 분할
+    // const geometry = new THREE.CircleGeometry(0.9, 16, Math.PI / 2, Math.PI); // 원판 사이즈, 원판 분할 수, 시작각, 종료각
+    // const geometry = new THREE.ConeGeometry(0.5, 2, 16, 2, true, 0, Math.PI); // 원뿔 밑면의 반지름 길이, 원뿔의 높이, 원뿔의 둘레의 분할 갯수, 원뿔의 높이 분할 갯수, 원뿔 밑면을 열어 놓을지 여부, 원뿔의 시작각, 원뿔의 연장각
+    // const geometry = new THREE.CylinderGeometry(
+    //   1,
+    //   1,
+    //   0.7,
+    //   16,
+    //   2,
+    //   true,
+    //   0,
+    //   Math.PI
+    // ); // 윗면 반지름 크기, 밑면 반지름 크기, 원통의 높이, 원통의 둘레 분할 갯수, 원통의 높이 방향 분할 갯수, 원통 윗면/밑면 열어 놓을지, 원통의 시작각, 원통의 끝각
+    // const geometry = new THREE.SphereGeometry(
+    //   1,
+    //   12,
+    //   12,
+    //   0,
+    //   Math.PI,
+    //   0,
+    //   Math.PI/2
+    // ); // 구의 반지름 크기, 수평 방향에 대한 분할 수, 수직 방향에 대한 분할 수, 수평 방향에 대한 구의 시작각, 연장각, 수직 방향에 대한 구의 시작각, 연장각
+    // const geometry = new THREE.RingGeometry(0.5, 1, 16, 2, 0, Math.PI); // 내부 반지름 값, 외부 반지름 값, 가장자리 둘레 분할 수 , 내부 방향에 대한 분할 수. 시작각, 연장각
+    // const geometry = new THREE.PlaneGeometry(1, 2, 4, 2); // 넓이에 대한 길이, 높이 길이, 넓이 방향의 분할 수, 높이 방향에 대한 분할 수
+    // const geometry = new THREE.TorusGeometry(1, 0.2, 16, 16, Math.PI); // 반지름, Torous를 구성하는 원통의 반지름 값, Torous의 방사 방향에 대한 분할 수, Torous의 원통 분할 수, Torous의 연장각 길이
+    const geometry = new THREE.TorusKnotGeometry(0.5, 0.1, 64, 32); // 반지름, 원통의 반지름, 분할 수 , 분할 수, 반복 횟수 값
     const fillMaterial = new THREE.MeshPhongMaterial({ color: 0x515151 });
     const cube = new THREE.Mesh(geometry, fillMaterial);
 
