@@ -45,57 +45,28 @@ class App {
   }
 
   _setupModel() {
-    class CustomSinCurve extends THREE.Curve {
-      constructor(scale) {
-        super();
-        this.scale = scale;
-      }
-      getPoint(t) {
-        const tx = t * 3 - 1.5;
-        const ty = Math.sin(2 * Math.PI * t);
-        const tz = 0;
-        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
-      }
+    const points = [];
+    for (let i = 0; i < 10; ++i) {
+      points.push(new THREE.Vector2(Math.sin(i * 0.2) * 3 + 3, (i - 5) * 0.8));
     }
-    const path = new CustomSinCurve(4);
-	// path를 TubeGeomtry에 넘겨주면 해당 path가 tube형태로 생기게 됨
-    const geometry = new THREE.TubeGeometry(path, 10, 1.4, 12, true); // tube 길이 분할수, 반지름 길이, 원통 닫을지 말지
 
+    // points로 생성된 path를 회전시키면서 생성된 geometry
+    const geometry = new THREE.LatheGeometry(points, 64, 0, Math.PI); // 분할수, 시작각, 끝각
     const fillMaterial = new THREE.MeshPhongMaterial({ color: 0x515151 });
     const cube = new THREE.Mesh(geometry, fillMaterial);
+
     const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00 });
     const line = new THREE.LineSegments(
       new THREE.WireframeGeometry(geometry),
       lineMaterial
     );
+
     const group = new THREE.Group();
     group.add(cube);
     group.add(line);
     this._scene.add(group);
     this._cube = group;
   }
-  //   _setupModel() {
-  //     class CustomSinCurve extends THREE.Curve {
-  //       constructor(scale) {
-  //         super();
-  //         this.scale = scale;
-  //       }
-  //       getPoint(t) {
-  //         const tx = t * 3 - 1.5;
-  //         const ty = Math.sin(2 * Math.PI * t);
-  //         const tz = 0;
-  //         return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
-  //       }
-  //     }
-  //     const path = new CustomSinCurve(4);
-  //     const geometry = new THREE.BufferGeometry();
-  //     const points = path.getPoints(30); // curve를 구성하는 좌표의 갯수
-  //     geometry.setFromPoints(points);
-
-  //     const material = new THREE.LineBasicMaterial({ color: 0xffff00 });
-  //     const line = new THREE.Line(geometry, material);
-  //     this._scene.add(line);
-  //   }
 
   resize() {
     const width = this._divContainer?.clientWidth;
