@@ -28,7 +28,7 @@ class App {
     const width = this._divContainer?.clientWidth;
     const height = this._divContainer?.clientHeight;
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 100); // container의 가로, 세로를 가져와서 카메라 설정
-    camera.position.z = 2;
+    camera.position.z = 15;
     this._camera = camera;
   }
 
@@ -45,43 +45,26 @@ class App {
   }
 
   _setupModel() {
-    // 정육면체 생성
-    // const geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2); // 가로, 세로, 깊이, 가로 분할, 세로 분할, 깊이 분할
-    // const geometry = new THREE.CircleGeometry(0.9, 16, Math.PI / 2, Math.PI); // 원판 사이즈, 원판 분할 수, 시작각, 종료각
-    // const geometry = new THREE.ConeGeometry(0.5, 2, 16, 2, true, 0, Math.PI); // 원뿔 밑면의 반지름 길이, 원뿔의 높이, 원뿔의 둘레의 분할 갯수, 원뿔의 높이 분할 갯수, 원뿔 밑면을 열어 놓을지 여부, 원뿔의 시작각, 원뿔의 연장각
-    // const geometry = new THREE.CylinderGeometry(
-    //   1,
-    //   1,
-    //   0.7,
-    //   16,
-    //   2,
-    //   true,
-    //   0,
-    //   Math.PI
-    // ); // 윗면 반지름 크기, 밑면 반지름 크기, 원통의 높이, 원통의 둘레 분할 갯수, 원통의 높이 방향 분할 갯수, 원통 윗면/밑면 열어 놓을지, 원통의 시작각, 원통의 끝각
-    // const geometry = new THREE.SphereGeometry(
-    //   1,
-    //   12,
-    //   12,
-    //   0,
-    //   Math.PI,
-    //   0,
-    //   Math.PI/2
-    // ); // 구의 반지름 크기, 수평 방향에 대한 분할 수, 수직 방향에 대한 분할 수, 수평 방향에 대한 구의 시작각, 연장각, 수직 방향에 대한 구의 시작각, 연장각
-    // const geometry = new THREE.RingGeometry(0.5, 1, 16, 2, 0, Math.PI); // 내부 반지름 값, 외부 반지름 값, 가장자리 둘레 분할 수 , 내부 방향에 대한 분할 수. 시작각, 연장각
-    // const geometry = new THREE.PlaneGeometry(1, 2, 4, 2); // 넓이에 대한 길이, 높이 길이, 넓이 방향의 분할 수, 높이 방향에 대한 분할 수
-    // const geometry = new THREE.TorusGeometry(1, 0.2, 16, 16, Math.PI); // 반지름, Torous를 구성하는 원통의 반지름 값, Torous의 방사 방향에 대한 분할 수, Torous의 원통 분할 수, Torous의 연장각 길이
-    const geometry = new THREE.TorusKnotGeometry(0.5, 0.1, 64, 32); // 반지름, 원통의 반지름, 분할 수 , 분할 수, 반복 횟수 값
+    const shape = new THREE.Shape();
+    const x = -2.5,
+      y = -5;
+    shape.moveTo(x + 2.5, y + 2.5);
+    shape.bezierCurveTo(x + 2.5, y + 2.5, x + 2, y, x, y);
+    shape.bezierCurveTo(x - 3, y, x - 3, y + 3.5, x - 3, y + 3.5);
+    shape.bezierCurveTo(x - 3, y + 5.5, x - 1.5, y + 7.7, x + 2.5, y + 9.5);
+    shape.bezierCurveTo(x + 6, y + 7.7, x + 8, y + 4.5, x + 8, y + 3.5);
+    shape.bezierCurveTo(x + 8, y + 3.5, x + 8, y, x + 5, y);
+    shape.bezierCurveTo(x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5);
+
+    const geometry = new THREE.ShapeGeometry(shape);
+
     const fillMaterial = new THREE.MeshPhongMaterial({ color: 0x515151 });
     const cube = new THREE.Mesh(geometry, fillMaterial);
-
-    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00 }); // 노란색 선의 재질 생성
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00 });
     const line = new THREE.LineSegments(
-      // geometry,
-      new THREE.WireframeGeometry(geometry), // wire frame 형태로 geometry를 표현하기 위함. 없으면 모델의 외곽선이 표현이 안됨
+      new THREE.WireframeGeometry(geometry),
       lineMaterial
-    ); // line type의 오브젝트로 만듦
-
+    );
     const group = new THREE.Group();
     group.add(cube);
     group.add(line);
