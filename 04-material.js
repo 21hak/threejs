@@ -36,54 +36,98 @@ class App {
     );
     camera.position.z = 3;
     this._camera = camera;
+    this._scene.add(camera);
   }
 
   _setupLight() {
+    // geometry를 균등하게 비추는 광원
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    this._scene.add(ambientLight);
+
     const color = 0xffffff;
     const intensity = 1;
     const light = new THREE.DirectionalLight(color, intensity);
     light.position.set(-1, 2, 4);
-    this._scene.add(light); // 광원을 scene 객체의 구성 요소에 추가
+    // this._scene.add(light); // 광원을 scene 객체의 구성 요소에 추가
+    this._camera.add(light); // 카메라 이동에 맞춰서 광원이 이동하도록
   }
 
   _setupModel() {
     const textureLoader = new THREE.TextureLoader();
     const map = textureLoader.load(
-      "../examples/textures/uv_grid_opengl.jpg",
-      (texture) => {
-        texture.repeat.x = 1;
-        texture.repeat.y = 1;
-        // texture.wrapS = THREE.RepeatWrapping; // 이미지를 반복시킴
-        // texture.wrapT = THREE.RepeatWrapping;
-        texture.wrapS = THREE.ClampToEdgeWrapping; // 처음만 이미지를 넣고, 나머지 영역은 이미지 끝단의 픽셀 반복
-        texture.wrapT = THREE.ClampToEdgeWrapping;
-        // texture.wrapS = THREE.MirroredRepeatWrapping; // 반전시켜서
-        // texture.wrapT = THREE.MirroredRepeatWrapping;
-        texture.offset.x = 0.0; // 이미지의 시작 위치를 설정
-        texture.offset.y = 0.0;
-
-        texture.rotation = THREE.MathUtils.degToRad(0);
-        texture.center.x = 0.5; // rotation의 축을 설정
-        texture.center.y = 0.5;
-
-        texture.magFilter = THREE.LinearFilter; // 가장 가까운 4개 픽셀 값을 선형 보간한 값
-        texture.magFilter = THREE.NearestFilter; // 가장 가까운 픽셀 값
-        // mipMap: 원본 사이즈를 줄여놓은 이미지를 미리 만들어 놓는것
-        texture.minFilter = THREE.NearestMipMapLinearFilter;
-      }
+      "images/glass/Glass_Window_002_basecolor.jpg"
     );
+    const mapAO = textureLoader.load(
+      "images/glass/Glass_Window_002_ambientOcclusion.jpg"
+    );
+    const mapHeight = textureLoader.load(
+      "images/glass/Glass_Window_002_height.png"
+    );
+    const mapNormal = textureLoader.load(
+      "images/glass/Glass_Window_002_normal.jpg"
+    );
+    const mapRoughness = textureLoader.load(
+      "images/glass/Glass_Window_002_roughness.jpg"
+    );
+    const mapMetalic = textureLoader.load(
+      "images/glass/Glass_Window_002_metallic.jpg"
+    );
+    const mapAlpha = textureLoader.load(
+      "images/glass/Glass_Window_002_opacity.jpg"
+    );
+    const material = new THREE.MeshStandardMaterial({
+      map: map,
+      /*
+       normalMap을 사용하면 box의 normal vector를 normalMap의 RGB값을 이용해서 계산함
+       Mesh 표면의 각 픽셀에 대한 normal vector를 계산하게 됨 -> 픽셀 단위로 광원 효과가 달라져서 입체감을 표현할 수 있게 됨
+       단 이 입체감은 착시현상임. (geometry의 형상이 바뀌는게 아니기 떄문에)
+       */
+      normalMap: mapNormal,
 
-    const material = new THREE.MeshPhysicalMaterial({ map: map });
+      displacementMap: mapHeight, // 실제로 mesh의  geometry 좌표를 변형시켜 입체감을 표현
+      displacementScale: 0.2, // 변이 효과를 20%만 적용.
+      displacementBias: -0.15, // displacement를 적용하기 위해서는 geometry의 좌표가 주어져야 하기 때문에 geometry의 segment를 나눠야함.
 
-    const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
-    box.position.set(-1, 0, 0);
-    this._scene.add(box);
+      /**
+       * image에 미리 세밀한 음영을 처리하는 작업
+       * 1. AmbientLight가 필요함
+       * 2. geometry의 uv 좌표를 설정해줘야함
+       */
+      aoMap: mapAO,
+      aoMapIntensity: 2,
 
-    const sphere = new THREE.Mesh(
-      new THREE.SphereGeometry(0.7, 32, 32),
+      roughnessMap: mapRoughness,
+      roughness: 0.5,
+
+      metalnessMap: mapMetalic,
+      metalness: 0.5,
+
+      alphaMap: mapAlpha,
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+
+    const box = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1, 256, 256, 256),
       material
     );
+    box.position.set(-1, 0, 0);
+    box.geometry.attributes.uv2 = box.geometry.attributes.uv;
+    this._scene.add(box);
+
+    // const boxHelper = new VertexNormalsHelper(box, 0.1, 0xffff00);
+    // this._scene.add(boxHelper);
+
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.7, 512, 512),
+      material
+    );
+    sphere.geometry.attributes.uv2 = sphere.geometry.attributes.uv;
     sphere.position.set(1, 0, 0);
+
+    // const sphereHelper = new VertexNormalsHelper(sphere, 0.1, 0xffff00);
+    // this._scene.add(sphereHelper);
+
     this._scene.add(sphere);
   }
 
