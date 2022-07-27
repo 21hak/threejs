@@ -47,57 +47,33 @@ class App {
   }
 
   _setupModel() {
-    // const material = new THREE.MeshBasicMaterial({
-    //   // material의 기본 속성들
-    //   visible: true, // 렌더링 시 mesh가 보일지 말지
-    //   transparent: true, // opacity를 사용할지 말지
-    //   opacity: 0.1,
-    //   depthTest: true, // mesh의 픽셀 위치의 z값을 깊이 buffer로 테스트할지 여부
-    //   depthWrite: true, // mesh의 픽셀에 대한 z값을 깊이 buffer에 기록할지 여부
-    //   side: THREE.FrontSide, // 앞면만 보일지, 뒷면만 할것인지, 둘다 할것인지 -> 광원의 영향을 받는 재질
+    const textureLoader = new THREE.TextureLoader();
+    const map = textureLoader.load(
+      "../examples/textures/uv_grid_opengl.jpg",
+      (texture) => {
+        texture.repeat.x = 1;
+        texture.repeat.y = 1;
+        // texture.wrapS = THREE.RepeatWrapping; // 이미지를 반복시킴
+        // texture.wrapT = THREE.RepeatWrapping;
+        texture.wrapS = THREE.ClampToEdgeWrapping; // 처음만 이미지를 넣고, 나머지 영역은 이미지 끝단의 픽셀 반복
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        // texture.wrapS = THREE.MirroredRepeatWrapping; // 반전시켜서
+        // texture.wrapT = THREE.MirroredRepeatWrapping;
+        texture.offset.x = 0.0; // 이미지의 시작 위치를 설정
+        texture.offset.y = 0.0;
 
-    //   color: 0xffff00,
-    //   wireframe: false,
-    // });
+        texture.rotation = THREE.MathUtils.degToRad(0);
+        texture.center.x = 0.5; // rotation의 축을 설정
+        texture.center.y = 0.5;
 
-    // Mesh를 구성하는 정점에서 광원의 영향을 계산하는 물질
-    // const material = new THREE.MeshLambertMaterial({
-    //   color: 0xffff00,
-    //   emissive: 0xff0000, // mesh가 방출하는 색상값
-    //   wireframe: false,
+        texture.magFilter = THREE.LinearFilter; // 가장 가까운 4개 픽셀 값을 선형 보간한 값
+        texture.magFilter = THREE.NearestFilter; // 가장 가까운 픽셀 값
+        // mipMap: 원본 사이즈를 줄여놓은 이미지를 미리 만들어 놓는것
+        texture.minFilter = THREE.NearestMipMapLinearFilter;
+      }
+    );
 
-    //   transparent: true,
-    //   opacity: 0.5,
-    //   side: THREE.DoubleSide, // 앞면만 보일지, 뒷면만 할것인지, 둘다 할것인지 -> 광원의 영향을 받는 재질
-    // });
-
-    // Mesh가 렌더링되는 픽셀 단위로 광원의 영향을 계싼
-    // const material = new THREE.MeshPhongMaterial({
-    //   color: 0xff0000,
-    //   emissive: 0x000000, // mesh가 방출하는 색상값
-    //   specular: 0xffff00, // 광원에 의해 반사되는 색
-    //   shininess: 4, // 반사 정도
-    //   flatShading: false,
-    // });
-
-    // const material = new THREE.MeshStandardMaterial({
-    //   color: 0xff0000,
-    //   emissive: 0x000000, // mesh가 방출하는 색상값
-    //   roughness: 0.25, // 표면 거친 정도. 값이 거칠수록 반사정도가 달라짐
-    //   metalness: 0.6,
-    //   flatShading: false,
-    // });
-
-    // MeshStandardMaterial를 상속
-    const material = new THREE.MeshPhysicalMaterial({
-      color: 0xff0000,
-      emissive: 0x000000, // mesh가 방출하는 색상값
-      roughness: 1, // 표면 거친 정도. 값이 거칠수록 반사정도가 달라짐
-      metalness: 0,
-      clearcoat: 1,
-      clearcoatRoughness: 0,
-      flatShading: false,
-    });
+    const material = new THREE.MeshPhysicalMaterial({ map: map });
 
     const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
     box.position.set(-1, 0, 0);
